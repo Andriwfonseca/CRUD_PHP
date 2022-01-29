@@ -24,7 +24,7 @@ if($sql->rowCount() > 0){
             <td><?php echo $usuario['email']; ?></td>
             <td>
                 <a href="editar.php?id=<?php echo $usuario['id']; ?>">[Editar] </a> 
-                <a href="excluir.php?id=<?php echo $usuario['id']; ?>">[Excluir]</a>
+                <a href="excluir.php?id=<?php echo $usuario['id']; ?>" onclick="return confirm('Tem certeza que deseja excluir?')">[Excluir]</a>
             </td>
         </tr>            
     <?php endforeach; ?>
