@@ -1,5 +1,8 @@
 <?php
 require 'config.php';
+require 'dao/UsuarioDaoMysql.php';
+
+$usuarioDao = new UsuarioDaoMysql($pdo);
 
 $nome = filter_input(INPUT_POST, 'nome');
 $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
@@ -7,26 +10,20 @@ $senha = filter_input(INPUT_POST, 'senha');
 
 if($nome && $email && $senha){
 
-    /*verifica se o email ja esta cadastrado*/
-    $sql = $pdo->prepare("SELECT * FROM usuarios WHERE email = :email");
-    $sql->bindValue(':email', $email);
-    $sql->execute();
-
-    if($sql->rowCount() === 0){    
-
-        $sql = $pdo->prepare("INSERT INTO usuarios (nome,email,senha) VALUES (:nome, :email, :senha)");
-        $sql->bindValue(':nome', $nome);
-        $sql->bindValue(':email', $email);
-        $sql->bindValue(':senha', md5($senha));
-        $sql->execute();
+    if($usuarioDao->findByEmail($email) === false){
+        $novoUsuario = new Usuario();
+        $novoUsuario->setNome($nome);
+        $novoUsuario->setEmail($email);
+        $novoUsuario->setSenha(md5($senha));  
+        
+        $usuarioDao->add($novoUsuario);
 
         header("Location: index.php");
         exit;
     }else{
         header("Location: adicionar.php");
-        exit;
-    }
-    
+        exit;    
+    }    
 }else{
     header("Location: adicionar.php");
     exit;

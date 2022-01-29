@@ -1,21 +1,17 @@
 <?php
 require 'config.php';
+require 'dao/UsuarioDaoMysql.php';
 
-$info = [];
+$usuarioDao = new UsuarioDaoMysql($pdo);
+
+$usuario = false;
 
 $id = filter_input(INPUT_GET, "id");
 
 if($id){
-    $sql = $pdo->prepare("SELECT * FROM usuarios WHERE id = :id");
-    $sql->bindValue(":id", $id);
-    $sql->execute();
-
-    if($sql->rowCount() > 0){
-        $info = $sql->fetch(PDO::FETCH_ASSOC);
-    }else{
-        header("Location: index.php");
-    }
-}else{
+    $usuario = $usuarioDao->findById($id);
+}
+if($usuario === false){
     header("Location: index.php");
     exit;
 }
@@ -24,15 +20,15 @@ if($id){
 <h1>Editar Usuário</h1>
 
 <form action="editar_action.php" method="post">
-    <input type="hidden" name="id" value="<?=$info['id']?>">
+    <input type="hidden" name="id" value="<?=$usuario->getId();?>">
 
     <label>
         Nome:<br/>
-        <input type="text" name="nome" value="<?=$info['nome']?>" required>
+        <input type="text" name="nome" value="<?=$usuario->getNome();?>" required>
     </label><br/><br/>
     <label>
         E-mail:<br/>
-        <input type="email" name="email" value="<?=$info['email']?>" required>
+        <input type="email" name="email" value="<?=$usuario->getEmail();?>" required>
     </label><br/><br/>
     <label>
         Senha:<br/>

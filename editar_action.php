@@ -1,5 +1,8 @@
 <?php
 require 'config.php';
+require 'dao/UsuarioDaoMysql.php';
+
+$usuarioDao = new UsuarioDaoMysql($pdo);
 
 $id = filter_input(INPUT_POST, 'id');
 $nome = filter_input(INPUT_POST, 'nome');
@@ -8,29 +11,23 @@ $senha = filter_input(INPUT_POST, 'senha');
 
 if($id && $nome && $email && $senha){
 
-    /*verifica se o email ja esta cadastrado*/
-    $sql = $pdo->prepare("SELECT * FROM usuarios WHERE email = :email and id != :id");
-    $sql->bindValue(':id', $id);
-    $sql->bindValue(':email', $email);
-    $sql->execute();
+    $u = $usuarioDao->findByEmail($email);
 
-    if($sql->rowCount() === 0){    
+    $usuario = $usuarioDao->findById($id);
 
-        $sql = $pdo->prepare("UPDATE usuarios SET nome = :nome, email = :email, senha = :senha WHERE id = :id");
-        $sql->bindValue(':id', $id);
-        $sql->bindValue(':nome', $nome);
-        $sql->bindValue(':email', $email);
-        $sql->bindValue(':senha', md5($senha));
-        $sql->execute();
+    /*validação email duplicado*/
+    if($u === false || $usuario->getEmail() == $email){
 
-        header("Location: index.php");
-        exit;
+        $usuario->setId($id);
+        $usuario->setNome($nome);
+        $usuario->setEmail($email);
+        $usuario->setSenha(md5($senha));
+    
+        $usuarioDao->update($usuario);    
     }else{
         header("Location: editar.php?id=".$id);
         exit;
-    }
-    
-}else{
-    header("Location: index.php");
-    exit;
+    }    
 }
+header("Location: index.php");
+exit;
