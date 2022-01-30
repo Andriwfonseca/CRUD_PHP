@@ -10,6 +10,7 @@ class UsuarioDaoMysql implements UsuarioDao{
     }
 
     public function add(Usuario $usuario){
+
         $sql = $this->pdo->prepare("INSERT INTO usuarios (nome, email, senha) VALUES (:nome, :email, :senha)");
         $sql->bindValue(":nome", $usuario->getNome());
         $sql->bindValue(":email", $usuario->getEmail());

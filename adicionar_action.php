@@ -11,10 +11,14 @@ $senha = filter_input(INPUT_POST, 'senha');
 if($nome && $email && $senha){
 
     if($usuarioDao->findByEmail($email) === false){
+
         $novoUsuario = new Usuario();
         $novoUsuario->setNome($nome);
         $novoUsuario->setEmail($email);
-        $novoUsuario->setSenha(md5($senha));  
+
+        $hash = password_hash($senha, PASSWORD_DEFAULT);
+
+        $novoUsuario->setSenha($hash);  
         
         $usuarioDao->add($novoUsuario);
 

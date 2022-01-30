@@ -21,7 +21,10 @@ if($id && $nome && $email && $senha){
         $usuario->setId($id);
         $usuario->setNome($nome);
         $usuario->setEmail($email);
-        $usuario->setSenha(md5($senha));
+
+        $hash = password_hash($senha, PASSWORD_DEFAULT);
+
+        $usuario->setSenha($hash);  
     
         $usuarioDao->update($usuario);    
     }else{
